@@ -28,17 +28,17 @@ class Controller {
   static async getHobbyById(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const people = await HobbyModel.findOne(id);
-      if (!people) {
+      const hobby = await HobbyModel.findOne(id);
+      if (!hobby) {
         res.status(404).json({
           status: "fail",
-          message: "No people found",
+          message: "No hobby found",
         });
       } else {
         res.status(200).json({
           status: "success",
           data: {
-            people,
+            hobby,
           },
         });
       }

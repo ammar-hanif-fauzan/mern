@@ -11,7 +11,9 @@ class Model {
 
   static async findOne<Hobby extends HobbiesType>(id: string) {
     try {
+      console.log(id);
       const objectId = new ObjectId(id);
+      console.log(objectId);
       const agg = [{ $match: { _id: objectId } }];
       const result = await this.getCollection("hobbies")
         .aggregate<Hobby>(agg)

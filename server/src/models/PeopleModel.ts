@@ -57,40 +57,80 @@ class Model {
 
   static async find<People extends PeopleType>() {
     try {
+      // const agg = [
+      //   {
+      //     $lookup: {
+      //       from: "users",
+      //       localField: "user_id",
+      //       foreignField: "_id",
+      //       as: "users",
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       "users.password": 0,
+      //     },
+      //   },
+      //   {
+      //     $lookup: {
+      //       from: "hobbies",
+      //       localField: "hobby._id",
+      //       foreignField: "_id",
+      //       as: "hobbies",
+      //     },
+      //   },
+      //   {
+      //     $lookup: {
+      //       from: "phone",
+      //       localField: "phone._id",
+      //       foreignField: "_id",
+      //       as: "phones",
+      //     },
+      //   },
+      // ];
       const agg = [
+        // Join people with users (one-to-one)
         {
           $lookup: {
-            from: "users",
-            localField: "user_id",
-            foreignField: "_id",
-            as: "users",
+            from: "users", // "users" collection
+            localField: "user_id", // field in people
+            foreignField: "_id", // field in users
+            as: "user_details", // alias for joined data
           },
         },
+
+        // Project to remove sensitive data like password from user
         {
           $project: {
-            "users.password": 0,
+            "user_details.password": 0, // Exclude password
           },
         },
+
+        // Join people with phones (one-to-many)
         {
           $lookup: {
-            from: "hobbies",
-            localField: "hobby._id",
-            foreignField: "_id",
-            as: "hobbies",
+            from: "phones", // "phones" collection
+            localField: "_id", // field in people (person_id)
+            foreignField: "person_id", // field in phones
+            as: "phones", // alias for joined phones data
           },
         },
+
+        // Join people with hobbies (many-to-many)
         {
           $lookup: {
-            from: "phone",
-            localField: "phone._id",
-            foreignField: "_id",
-            as: "phones",
+            from: "hobbies", // "hobbies" collection
+            localField: "_id", // field in people (person_id)
+            foreignField: "person_ids", // field in hobbies (array of person_ids)
+            as: "hobbies", // alias for joined hobbies data
           },
         },
       ];
+
       const result = await this.getCollection("people")
         .aggregate<People>(agg)
         .toArray();
+      console.log(result);
       return result;
     } catch (error) {
       throw new Error(`Error finding documents: ${error}`);

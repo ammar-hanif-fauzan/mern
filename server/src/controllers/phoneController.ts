@@ -53,7 +53,7 @@ class Controller {
   static async createPhone(req: Request, res: Response) {
     try {
       const data = req.body;
-      data.people_id = new ObjectId(data.people);
+      data.people_id = new ObjectId(data.people_id);
       const result = phoneSchema.safeParse(data);
       if (!result.success) {
         res.status(400).json({
